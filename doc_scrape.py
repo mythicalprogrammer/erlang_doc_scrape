@@ -1,5 +1,6 @@
 from bs4 import BeautifulSoup
 import os
+import re 
 
 root_dir = 'otp_doc_html_R16A_RELEASE_CANDIDATE/'
 #app_list
@@ -50,6 +51,56 @@ for i in range(0, len(app_soup)):
 #print len(sql_app_id_lookup) # 54 
 #print app_link_lookup
 #print len(app_link_lookup) # 54
+
+"""
+Going Through Each App and Scraping.
+"""
+"""
+dir = app_link_lookup["sasl"]
+app_html = open(dir,'r')
+app_soup = BeautifulSoup(app_html).find('ul', {'class':'flipMenu'})
+print app_soup.prettify()
+"""
+
+"""
+Scraping stdlib
+"""
+app_id = sql_app_id_lookup['stdlib'] # 5
+dir = app_link_lookup["stdlib"]
+app_html = open(dir,'r')
+flip_soup = BeautifulSoup(app_html).find('ul', {'class':'flipMenu'})
+
+li_list = flip_soup.findAll('li')
+
+
+#####
+#app html
+#####
+first_li = li_list[0] 
+#print first_li.a.text.encode('UTF-8').strip()
+href = first_li.a["href"]
+app_href = dir[:-10] + href 
+#print app_href
+app_info_page = open(app_href,'r')
+app_info_soup = BeautifulSoup(app_info_page).find('div', {'id':'content'}).div
+#print app_info_soup
+info = app_info_soup.find_all('div',{"class":"REFBODY"})
+module = info[0].text.strip()
+summary = info[1].text.strip()
+description = info[2].p.p.text
+description = [x.encode('UTF-8') for x in description if x != '\n' ]
+description = [x for x in description if x != '' ]
+description = ''.join(map(str, description))
+description = re.sub(' +',' ',description)
+configuration = info[3]
+see_also = info[4].p.text
+see_also = [x.encode('UTF-8') for x in see_also if x != '\n' ]
+see_also = ''.join(map(str, see_also))
+see_also = re.sub(' +',' ', see_also)
+print module
+print summary
+print description
+print see_also
 
 """
 #print app_soup[1]

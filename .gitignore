@@ -8,6 +8,7 @@ otp_doc_html_R16A_RELEASE_CANDIDATE/
 *.exe
 *.o
 *.so
+*.swp
 
 # Packages #
 ############

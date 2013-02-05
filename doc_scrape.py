@@ -70,13 +70,12 @@ dir = app_link_lookup["stdlib"]
 app_html = open(dir,'r')
 flip_soup = BeautifulSoup(app_html).find('ul', {'class':'flipMenu'})
 
-li_list = flip_soup.findAll('li')
 
 
 #####
 #app html
 #####
-first_li = li_list[0] 
+first_li = flip_soup.find('li')
 #print first_li.a.text.encode('UTF-8').strip()
 href = first_li.a["href"]
 app_href = dir[:-10] + href 
@@ -97,10 +96,26 @@ see_also = info[4].p.text
 see_also = [x.encode('UTF-8') for x in see_also if x != '\n' ]
 see_also = ''.join(map(str, see_also))
 see_also = re.sub(' +',' ', see_also)
-print module
-print summary
-print description
-print see_also
+#print module
+#print summary
+#print description
+#print see_also
+
+"""
+Going through the table of contents lists with folders icon
+"""
+def soupify(url):
+    html_file = open(app_href,'r')
+    return BeautifulSoup(html_file)
+
+li_list = flip_soup.findAll('li',{'id':'no'})
+for i in range(0, len(li_list)):
+    if i > 0:
+        break
+    href = li_list[i].a["href"]
+    href = dir[:-10] + href 
+    soup = soupify(href)
+
 
 """
 #print app_soup[1]

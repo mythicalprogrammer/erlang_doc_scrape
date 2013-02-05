@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
 import os
 
+root_dir = 'otp_doc_html_R16A_RELEASE_CANDIDATE/'
 #app_list
 #app_list = os.listdir('otp_doc_html_R16A_RELEASE_CANDIDATE/lib')
 #app_list = [x.split('-')[0] for x in app_list]
@@ -11,6 +12,7 @@ app_category = ''
 app_list = []
 sql_app_id_iter = 0
 sql_app_id_lookup = {}
+app_link_lookup = {}
 for i in range(0, len(app_soup)):
     if len(app_soup[i].attrs) == 0:
         if len(app_soup[i].td.attrs) == 2:
@@ -24,12 +26,14 @@ for i in range(0, len(app_soup)):
            #print a_list[0].text # App Name
            #print a_list[1].text # App Version
            #print td_list[2].text.strip() # App Summary
+           app_link = root_dir + a_list[0]['href'].strip().encode('UTF-8')[3:] # App URL 
            app_name = a_list[0].text.strip().encode('UTF-8') # App Name
            app_version = a_list[1].text.strip().encode('UTF-8') # App Version
            app_summary = td_list[2].text.strip().encode('UTF-8') # App Summary
 	   app_list.append((app_name,app_version,app_summary,app_category))
 	   sql_app_id_iter += 1 
 	   sql_app_id_lookup[app_name] = sql_app_id_iter
+	   app_link_lookup[app_name] = app_link 
         #if td_list[0].table != None:
             #print app_soup[i].td.table.tr.td.find_all('a')
             #a_list = app_soup[i].td.table.tr.td.find_all('a')
@@ -44,6 +48,8 @@ for i in range(0, len(app_soup)):
 #print sql_app_id_lookup['Basic'] # 1
 #print sql_app_id_lookup['Miscellaneous'] # 9
 #print len(sql_app_id_lookup) # 54 
+#print app_link_lookup
+#print len(app_link_lookup) # 54
 
 """
 #print app_soup[1]

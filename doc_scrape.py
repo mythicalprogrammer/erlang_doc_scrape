@@ -15,8 +15,6 @@ for i in range(0, len(app_soup)):
     if len(app_soup[i].attrs) == 0:
         if len(app_soup[i].td.attrs) == 2:
             app_category = app_soup[i].td.font.b.text.strip().encode('UTF-8') # App Category
-	    sql_app_id_iter += 1 
-	    sql_app_id_lookup[app_category] = sql_app_id_iter
    #         print app_soup[i].td.font.b.text # App Category
     elif len(app_soup[i].attrs) == 1:
         td_list = app_soup[i].find_all('td')
@@ -30,6 +28,8 @@ for i in range(0, len(app_soup)):
            app_version = a_list[1].text.strip().encode('UTF-8') # App Version
            app_summary = td_list[2].text.strip().encode('UTF-8') # App Summary
 	   app_list.append((app_name,app_version,app_summary,app_category))
+	   sql_app_id_iter += 1 
+	   sql_app_id_lookup[app_name] = sql_app_id_iter
         #if td_list[0].table != None:
             #print app_soup[i].td.table.tr.td.find_all('a')
             #a_list = app_soup[i].td.table.tr.td.find_all('a')
@@ -43,7 +43,7 @@ for i in range(0, len(app_soup)):
 #print sql_app_id_lookup
 #print sql_app_id_lookup['Basic'] # 1
 #print sql_app_id_lookup['Miscellaneous'] # 9
-#print len(sql_app_id_lookup) # 9
+#print len(sql_app_id_lookup) # 54 
 
 """
 #print app_soup[1]

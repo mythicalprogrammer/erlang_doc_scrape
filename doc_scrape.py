@@ -125,7 +125,7 @@ see_also = re.sub(' +',' ', see_also)
 Going through the table of contents lists with folders icon
 """
 def soupify(url):
-    html_file = open(app_href,'r')
+    html_file = open(url,'r')
     return BeautifulSoup(html_file)
 
 li_list = flip_soup.findAll('li',{'id':'no'})
@@ -134,7 +134,10 @@ for i in range(0, len(li_list)):
         break
     href = li_list[i].a["href"]
     href = dir[:-10] + href 
+    #print href
     soup = soupify(href)
+    print soup
+    #soup = soup.find("div",{"id":'content'}).find("div",{"class":"innertube"})
 
 
 """

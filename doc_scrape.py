@@ -31,6 +31,9 @@ for i in range(0, len(app_soup)):
            app_name = a_list[0].text.strip().encode('UTF-8') # App Name
            app_version = a_list[1].text.strip().encode('UTF-8') # App Version
            app_summary = td_list[2].text.strip().encode('UTF-8') # App Summary
+           app_summary = [x.encode('UTF-8') for x in app_summary if x != '\n' ]
+           app_summary = ''.join(map(str, app_summary))
+           app_summary = re.sub(' +',' ', app_summary)
 	   app_list.append((app_name,app_version,app_summary,app_category))
 	   sql_app_id_iter += 1 
 	   sql_app_id_lookup[app_name] = sql_app_id_iter
@@ -43,7 +46,22 @@ for i in range(0, len(app_soup)):
     #if i > 1:
     #    break;
 
-#print app_list
+sql_apps = ''
+for i in range(0, len(app_list)):
+    sql_apps += "INSERT INTO apps (name,version,summary) "
+    sql_apps += 'VALUES ("'+app_list[i][0]+'","'+app_list[i][1]+'","'+app_list[i][2]+'");' 
+    sql_apps += "\n"
+    sql_apps += "\n"
+
+f = open('sql_apps.sql', 'w')
+f.write(sql_apps)
+f.close()
+
+#print app_list[0]
+#('erts', '5.10', 'Functionality necessary to run the Erlang System itself', 'Basic')
+#name version summary category
+#INSERT INTO table_name (name,version,summary,category)
+#VALUES (value1, value2, value3,...)
 #print len(app_list) # 54
 #print sql_app_id_lookup
 #print sql_app_id_lookup['Basic'] # 1
@@ -63,7 +81,7 @@ print app_soup.prettify()
 """
 
 """
-Scraping stdlib
+craping stdlib
 """
 app_id = sql_app_id_lookup['stdlib'] # 5
 dir = app_link_lookup["stdlib"]
@@ -86,7 +104,9 @@ app_info_soup = BeautifulSoup(app_info_page).find('div', {'id':'content'}).div
 info = app_info_soup.find_all('div',{"class":"REFBODY"})
 module = info[0].text.strip()
 summary = info[1].text.strip()
-description = info[2].p.p.text
+#print info[2].findAll("p")[1].text
+#description = info[2].p.p.text
+description = info[2].findAll("p")[1].text
 description = [x.encode('UTF-8') for x in description if x != '\n' ]
 description = [x for x in description if x != '' ]
 description = ''.join(map(str, description))

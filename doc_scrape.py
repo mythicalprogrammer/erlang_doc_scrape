@@ -169,9 +169,10 @@ for i in range(0, len(soup.contents)):
 	#print fun_list 
         syntax_list = soup.contents[i].findAll("span",{"class":"bold_code"})
 	syntax_list = [x.renderContents() for x in syntax_list]
-	print zip(fun_list_name, syntax_list)
-        function_syntax = soup.contents[i].span.text
-        function_syntax = cgi.escape(function_syntax).encode("ascii", "xmlcharrefreplace")
+	fun_name_syntax_list = zip(fun_list_name, syntax_list)
+	#print fun_name_syntax_list
+        #function_syntax = soup.contents[i].span.text
+        #function_syntax = cgi.escape(function_syntax).encode("ascii", "xmlcharrefreplace")
 	#print i
         #print function_syntax
         """
@@ -195,16 +196,20 @@ for i in range(0, len(soup.contents)):
             fun_info = soup.contents[i+3].findAll("p")
         else:
             fun_info = soup.contents[i+2].findAll("p")
-        function_name = fun_info[0].a["name"]
-        function_name = cgi.escape(function_name).encode("ascii", "xmlcharrefreplace")
-        print function_name
+        #function_name = fun_info[0].a["name"]
+        #function_name = cgi.escape(function_name).encode("ascii", "xmlcharrefreplace")
+        #print function_name
         function_summary = fun_info[1].contents
         function_summary = [x.encode('UTF-8') for x in function_summary if x != '\n' ]
         function_summary = [x for x in function_summary if x != '' ]
         function_summary = ''.join(map(str, function_summary))
         function_summary = re.sub(' +',' ',function_summary)
         function_summary = re.sub('\n',' ',function_summary)
+	#print fun_name_syntax_list
         #print function_summary
+	for k in range(0,len(fun_name_syntax_list)):
+	    fun_name_syntax_list[k] = tuple(list(fun_name_syntax_list[k]) + [function_summary])
+	#print fun_name_syntax_list[k]
         if len(fun_info) == 3:
             see_more = fun_info[2].span.a.text.strip()
 

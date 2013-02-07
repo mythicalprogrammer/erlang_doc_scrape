@@ -131,7 +131,7 @@ def soupify(url):
 
 li_list = flip_soup.findAll('li',{'id':'no'})
 for i in range(0, len(li_list)):
-    if i > 1:
+    if i > 2:
         break
     href = li_list[i].a["href"]
     href = dir[:-10] + href 
@@ -151,6 +151,7 @@ for i in range(0, len(li_list)):
 #print function 
 FLAG_FUNCTION_SECTION = False
 for i in range(0, len(soup.contents)):
+    FLAG_FUNCTION_SEE_MORE = False
     #if i > 36:
     #if i > 42:
     #    break
@@ -199,19 +200,35 @@ for i in range(0, len(soup.contents)):
         #function_name = fun_info[0].a["name"]
         #function_name = cgi.escape(function_name).encode("ascii", "xmlcharrefreplace")
         #print function_name
-        function_summary = fun_info[1].contents
-        function_summary = [x.encode('UTF-8') for x in function_summary if x != '\n' ]
-        function_summary = [x for x in function_summary if x != '' ]
-        function_summary = ''.join(map(str, function_summary))
-        function_summary = re.sub(' +',' ',function_summary)
-        function_summary = re.sub('\n',' ',function_summary)
+        if len(fun_info) == 3 and hasattr(fun_info[2], 'strong'):
+	    if hasattr(fun_info[2].strong, 'content'):
+	        if fun_info[2].strong.contents == "See also:":
+            	    see_more = fun_info[2].span.a.text.strip()
+		    FLAG_FUNCTION_SEE_MORE = True 
+	function_summary = ''
+        if FLAG_FUNCTION_SEE_MORE: 
+            function_summary = fun_info[1].contents
+            function_summary = [x.encode('UTF-8') for x in function_summary if x != '\n' ]
+            function_summary = [x for x in function_summary if x != '' ]
+            function_summary = ''.join(map(str, function_summary))
+            function_summary = re.sub(' +',' ',function_summary)
+            function_summary = re.sub('\n',' ',function_summary)
+	else:
+	    for l in range(1,len(fun_info)):
+	        function_summary_temp = fun_info[l].contents
+                function_summary_temp = ''.join(map(str, function_summary_temp))
+                function_summary += str(function_summary_temp)
+                function_summary = [x.encode('UTF-8') for x in function_summary if x != '\n' ]
+                function_summary = [x for x in function_summary if x != '' ]
+                function_summary = ''.join(map(str, function_summary))
+                function_summary = re.sub(' +',' ',function_summary)
+                function_summary = re.sub('\n',' ',function_summary)
+		print function_summary
+        #print function_summary[0]
 	#print fun_name_syntax_list
-        #print function_summary
 	for k in range(0,len(fun_name_syntax_list)):
 	    fun_name_syntax_list[k] = tuple(list(fun_name_syntax_list[k]) + [function_summary])
 	#print fun_name_syntax_list[k]
-        if len(fun_info) == 3:
-            see_more = fun_info[2].span.a.text.strip()
 
     if (
             hasattr(soup.contents[i], 'name') and 

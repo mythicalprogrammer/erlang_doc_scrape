@@ -131,7 +131,7 @@ def soupify(url):
 
 li_list = flip_soup.findAll('li',{'id':'no'})
 for i in range(0, len(li_list)):
-    if i > 0:
+    if i > 1:
         break
     href = li_list[i].a["href"]
     href = dir[:-10] + href 
@@ -158,16 +158,27 @@ for i in range(0, len(soup.contents)):
             FLAG_FUNCTION_SECTION and
             hasattr(soup.contents[i], 'name') and 
             soup.contents[i].name == 'p' 
-            and i > 40
        ):
+        #print soup.contents[i]
+        fun_list = soup.contents[i].findAll("a",{"name":True})
+	fun_list_name = []
+	#print len(fun_list)
+	for j in range(0, len(fun_list)):
+	    fun_list_name.append(str(fun_list[j]["name"]))
+	#print fun_list_name
+	#print fun_list 
+        syntax_list = soup.contents[i].findAll("span",{"class":"bold_code"})
+	syntax_list = [x.renderContents() for x in syntax_list]
+	print zip(fun_list_name, syntax_list)
         function_syntax = soup.contents[i].span.text
         function_syntax = cgi.escape(function_syntax).encode("ascii", "xmlcharrefreplace")
+	#print i
         #print function_syntax
         """
         fun_info = soup.contents[i+1].p.text
         fun_info = soup.contents[i+1].p.text
-        print fun_info
-        print 'end'
+        #print fun_info
+        #print 'end'
         """
         types = ''
         if (
@@ -186,7 +197,7 @@ for i in range(0, len(soup.contents)):
             fun_info = soup.contents[i+2].findAll("p")
         function_name = fun_info[0].a["name"]
         function_name = cgi.escape(function_name).encode("ascii", "xmlcharrefreplace")
-        #print function_name
+        print function_name
         function_summary = fun_info[1].contents
         function_summary = [x.encode('UTF-8') for x in function_summary if x != '\n' ]
         function_summary = [x for x in function_summary if x != '' ]

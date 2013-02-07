@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
 import os
 import re 
+import cgi
 
 root_dir = 'otp_doc_html_R16A_RELEASE_CANDIDATE/'
 #app_list
@@ -144,17 +145,68 @@ for i in range(0, len(li_list)):
 #print module
 #print summary
 #print description
-print soup.contents[18]
+#print soup.contents[18]
 #print soup.contents[34].name
 #function = soup.contents[34].find('a')['name']
 #print function 
-
+FLAG_FUNCTION_SECTION = False
 for i in range(0, len(soup.contents)):
-	if i > 60:
-		break
-	if hasattr(soup.contents[i], 'name') and soup.contents[i].name == 'p':
-		if hasattr(soup.contents[i].p, 'span') and soup.contents[i].p.span != None:
-			print soup.contents[i].p.span
+    #if i > 36:
+    #if i > 42:
+    #    break
+    if (
+            FLAG_FUNCTION_SECTION and
+            hasattr(soup.contents[i], 'name') and 
+            soup.contents[i].name == 'p' 
+            and i > 40
+       ):
+        function_syntax = soup.contents[i].span.text
+        function_syntax = cgi.escape(function_syntax).encode("ascii", "xmlcharrefreplace")
+        #print function_syntax
+        """
+        fun_info = soup.contents[i+1].p.text
+        fun_info = soup.contents[i+1].p.text
+        print fun_info
+        print 'end'
+        """
+        types = ''
+        if (
+                hasattr(soup.contents[i+1], 'p') and
+                soup.contents[i+1].p.text == "Types:"
+           ):
+            types = soup.contents[i+1].div
+            types = [x.encode('UTF-8') for x in types if x != '\n' ]
+            types = [x for x in types if x != '' ]
+            types = ''.join(map(str, types))
+            types = re.sub(' +',' ',types)
+            types = re.sub('\n',' ',types)
+            #print types
+            fun_info = soup.contents[i+3].findAll("p")
+        else:
+            fun_info = soup.contents[i+2].findAll("p")
+        function_name = fun_info[0].a["name"]
+        function_name = cgi.escape(function_name).encode("ascii", "xmlcharrefreplace")
+        #print function_name
+        function_summary = fun_info[1].contents
+        function_summary = [x.encode('UTF-8') for x in function_summary if x != '\n' ]
+        function_summary = [x for x in function_summary if x != '' ]
+        function_summary = ''.join(map(str, function_summary))
+        function_summary = re.sub(' +',' ',function_summary)
+        function_summary = re.sub('\n',' ',function_summary)
+        #print function_summary
+        if len(fun_info) == 3:
+            see_more = fun_info[2].span.a.text.strip()
+
+    if (
+            hasattr(soup.contents[i], 'name') and 
+            soup.contents[i].name == 'h3' and
+            soup.contents[i].text.strip() == 'EXPORTS' 
+       ):
+        FLAG_FUNCTION_SECTION = True
+            
+
+
+
 """
 		if i > 0:
 			print i

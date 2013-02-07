@@ -134,10 +134,51 @@ for i in range(0, len(li_list)):
         break
     href = li_list[i].a["href"]
     href = dir[:-10] + href 
-    #print href
     soup = soupify(href)
-    print soup
-    #soup = soup.find("div",{"id":'content'}).find("div",{"class":"innertube"})
+    soup = soup.find("div",{"id":'content'}).find("div",{"class":"innertube"})
+    info = soup.find_all('div',{"class":"REFBODY"})
+    module = info[0].text.strip()
+    summary = info[1].text.strip()
+    description = info[2].p
+
+#print module
+#print summary
+#print description
+print soup.contents[18]
+#print soup.contents[34].name
+#function = soup.contents[34].find('a')['name']
+#print function 
+
+for i in range(0, len(soup.contents)):
+	if i > 60:
+		break
+	if hasattr(soup.contents[i], 'name') and soup.contents[i].name == 'p':
+		if hasattr(soup.contents[i].p, 'span') and soup.contents[i].p.span != None:
+			print soup.contents[i].p.span
+"""
+		if i > 0:
+			print i
+			#print soup.contents[i].prettify()
+			function = soup.contents[i].find('a')['name']
+			print "function:"
+			print function
+			semantic = soup.contents[i].find('span').text.strip()
+			#print "semantic:"
+			#print semantic
+			types = soup.contents[i].div.contents
+			types = soup.contents[i].div.p.replaceWith('')
+			types = soup.contents[i].div.contents
+			types = [x.encode('UTF-8') for x in types if x != '\n' ]
+			types = [x for x in types if x != '' ]
+			types = ''.join(map(str, types))
+			types = BeautifulSoup(types).prettify()
+			print "types:"
+			print types
+			summary = soup.contents[i+2].findChildren()[0].findChildren()[0]
+			print "summary:"
+			print summary
+
+"""
 
 
 """

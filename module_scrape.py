@@ -115,18 +115,20 @@ def soupify(url):
 li_list = flip_soup.findAll('li',{'id':'no'})
 sql_module = ''
 for i in range(0, len(li_list)):
-    if i > 2:
+    if i > 8:
         break
     href = li_list[i].a["href"]
     href = dir[:-10] + href 
     soup = soupify(href)
     soup = soup.find("div",{"id":'content'}).find("div",{"class":"innertube"})
     info = soup.find_all('div',{"class":"REFBODY"})
-    module = info[0].text.strip()
-    summary = info[1].text.strip()
+    module = info[0].text.strip().encode('UTF-8')
+    summary = info[1].text.strip().encode('UTF-8')
     description = info[2].contents
     description = [re.sub('\n','',x.encode('UTF-8')) for x in description if x != '\n' ]
     description = [ re.sub(' +',' ',x) for x in description ]
+    description = [ re.sub('%','\%',x) for x in description ]
+    description = [ re.sub("'","\\'",x) for x in description ]
     description = ''.join(map(str, description))
     description = description[7:]
     sql_module+= "INSERT INTO modules (app_id,name,summary,description) "
@@ -134,83 +136,10 @@ for i in range(0, len(li_list)):
     sql_module+= "\n"; 
     sql_module+= "\n"; 
 
-print sql_module
 #print module
 #print summary
 #print description
-    #sql_module+= "INSERT INTO modules (app_id,name,summary,description) "
-    #sql_module+= 'VALUES ("5","'+module+'","'summary'","'+description+'");' 
-#f = open('sql_apps.sql', 'w')
-#f.write(sql_apps)
-#f.close()
-#print soup.contents[18]
-#print soup.contents[34].name
-#function = soup.contents[34].find('a')['name']
-#print function 
-FLAG_FUNCTION_SECTION = False
-for i in range(0, len(soup.contents)):
-    FLAG_FUNCTION_SEE_MORE = False
-    if (
-            FLAG_FUNCTION_SECTION and
-            hasattr(soup.contents[i], 'name') and 
-            soup.contents[i].name == 'p' 
-       ):
-        fun_list = soup.contents[i].findAll("a",{"name":True})
-        fun_list_name = []
-        for j in range(0, len(fun_list)):
-            fun_list_name.append(str(fun_list[j]["name"]))
-        syntax_list = soup.contents[i].findAll("span",{"class":"bold_code"})
-        syntax_list = [re.sub('<[^<]+?>', '',re.sub('<br/>','\n',x.renderContents())) for x in syntax_list]
-        fun_name_syntax_list = zip(fun_list_name, syntax_list)
-        types = ''
-        if (
-            hasattr(soup.contents[i+1], 'p') and
-            soup.contents[i+1].p.text == "Types:"
-          ):
-          types = soup.contents[i+1].div
-          types = [x.encode('UTF-8') for x in types if x != '\n' ]
-          types = [x for x in types if x != '' ]
-          types = [re.sub('<[^<]+?>', '',re.sub('<br/>','\n',x)) for x in types]
-          types = ''.join(map(str, types))
-          types = re.sub(' +',' ',types)
-          types = re.sub('\n',' ',types)
-          fun_info = soup.contents[i+3].findAll("p")
-        else:
-          fun_info = soup.contents[i+2].findAll("p")
-        if len(fun_info) == 3 and hasattr(fun_info[2], 'strong'):
-            if hasattr(fun_info[2].strong, 'content'):
-                if fun_info[2].strong.contents == "See also:":
-                    see_more = fun_info[2].span.a.text.strip()
-                    FLAG_FUNCTION_SEE_MORE = True 
-        function_summary = ''
-        if FLAG_FUNCTION_SEE_MORE: 
-            function_summary = fun_info[1].contents
-            function_summary = [x.encode('UTF-8') for x in function_summary if x != '\n' ]
-            function_summary = [x for x in function_summary if x != '' ]
-            function_summary = ''.join(map(str, function_summary))
-            function_summary = re.sub(' +',' ',function_summary)
-            function_summary = re.sub('\n',' ',function_summary)
-        else:
-            for l in range(1,len(fun_info)):
-                function_summary_temp = fun_info[l].contents
-                function_summary_temp = ''.join(map(str, function_summary_temp))
-                function_summary += str(function_summary_temp)
-                function_summary = [x.encode('UTF-8') for x in function_summary if x != '\n' ]
-                function_summary = [x for x in function_summary if x != '' ]
-                function_summary = ''.join(map(str, function_summary))
-                function_summary = re.sub(' +',' ',function_summary)
-                #function_summary = re.sub('<[^<]+?>', '',function_summary)
-        for k in range(0,len(fun_name_syntax_list)):
-            if len(types) > 0:
-                fun_name_syntax_list[k] = tuple(list(fun_name_syntax_list[k]) + [types] + [function_summary])
-            else:
-                fun_name_syntax_list[k] = tuple(list(fun_name_syntax_list[k]) + [function_summary])
-        #print fun_name_syntax_list
-    if (
-            hasattr(soup.contents[i], 'name') and 
-            soup.contents[i].name == 'h3' and
-            soup.contents[i].text.strip() == 'EXPORTS' 
-       ):
-        FLAG_FUNCTION_SECTION = True
-            
-#print function_summary[0]
+#print sql_module
+f = open('sql_module_stdlib.sql', 'w')
+f.write(sql_module)
+f.close()
